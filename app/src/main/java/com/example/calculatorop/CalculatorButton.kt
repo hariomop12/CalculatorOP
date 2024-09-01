@@ -47,7 +47,7 @@ fun CalculatorButton(
             text = symbol,
             style = textStyle,
             fontSize = 36.sp,
-            color = Color.Red
+            color = Color.White,
         )
     }
 }
