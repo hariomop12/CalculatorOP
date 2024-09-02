@@ -1,6 +1,16 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("org.jlleitschuh.gradle.ktlint")
+}
+
+ktlint {
+    version.set("0.48.2")
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+    enableExperimentalRules.set(true)
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
 
 android {
