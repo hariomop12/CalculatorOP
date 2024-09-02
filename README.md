@@ -19,4 +19,6 @@ The application follows the **MVVM (Model-View-ViewModel)** architecture pattern
 - **Kotlin**: The official programming language for Android.
 - **Jetpack Compose**: Modern toolkit for building native UI.
 
-[![Screenshot-20240901-181650.png](https://i.postimg.cc/J4Z7gFZT/Screenshot-20240901-181650.png)](https://postimg.cc/svfRGwnS)
+[![Whats-App-Image-2024-09-01-at-19-59-40-3725f8d5.jpg](https://i.postimg.cc/Z5mnc4vb/Whats-App-Image-2024-09-01-at-19-59-40-3725f8d5.jpg)](https://postimg.cc/zVdqDmk6)
+
+
