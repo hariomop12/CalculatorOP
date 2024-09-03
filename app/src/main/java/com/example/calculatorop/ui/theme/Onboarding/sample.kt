@@ -18,3 +18,22 @@ fun jhe(modifier: Modifier = Modifier) {
         Text("Hello, World!")
     }
 }
+
+@Composable
+fun esf(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text("Hello, World!")
+        Text("Hello, World!")
+
+
+
+
+
+    }
+
+
+}
