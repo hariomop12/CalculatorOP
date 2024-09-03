@@ -31,19 +31,31 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Step 4: Run unit tests
+      # Step 4: Install Android SDK build tools (including apksigner)
+      - name: Install Android SDK Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          unzip commandlinetools-linux-8512546_latest.zip -d cmdline-tools
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          mv cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;30.0.3"
+
+      # Step 5: Run unit tests
       - name: Run unit test
         run: ./gradlew clean testDebug
 
-      # Step 5: Decrypt the keystore file and save it locally
+      # Step 6: Decrypt the keystore file and save it locally
       - name: Decrypt and Setup Keystore
         run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > release.keystore
 
-      # Step 6: Build the unsigned APK
+      # Step 7: Build the unsigned APK
       - name: Build Unsigned APK
         run: ./gradlew assembleRelease
 
-      # Step 7: Sign the APK with the keystore
+      # Step 8: Sign the APK with the keystore
       - name: Sign the APK
         run: |
           jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
@@ -53,21 +65,20 @@ jobs:
           app/build/outputs/apk/release/app-release-unsigned.apk \
           ${{ secrets.KEY_ALIAS }}
 
-      # Step 8: Align the APK
+      # Step 9: Align the APK
       - name: Zipalign the APK
         run: |
-          # Dynamically find the latest build-tools version
-          ZIPALIGN=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -n 1)/zipalign
+          ZIPALIGN=$ANDROID_HOME/build-tools/30.0.3/zipalign
           $ZIPALIGN -v 4 \
           app/build/outputs/apk/release/app-release-unsigned.apk \
           app/build/outputs/apk/release/app-release.apk
 
-      # Step 9: Verify APK signature
+      # Step 10: Verify APK signature
       - name: Verify APK Signature
         run: |
-          apksigner verify app/build/outputs/apk/release/app-release.apk
+          $ANDROID_HOME/build-tools/30.0.3/apksigner verify app/build/outputs/apk/release/app-release.apk
 
-      # Step 10: Create a new release on GitHub
+      # Step 11: Create a new release on GitHub
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -79,7 +90,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # Step 11: Upload the signed and aligned APK to the release
+      # Step 12: Upload the signed and aligned APK to the release
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
         env:
