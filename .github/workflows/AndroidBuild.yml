@@ -30,9 +30,32 @@ jobs:
       - name: Run unit test
         run: ./gradlew clean testDebug
 
-      - name: Build Release APK
+      # Decrypt the keystore file and save it locally
+      - name: Decrypt and Setup Keystore
+        run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > release.keystore
+
+      # Build the unsigned APK
+      - name: Build Unsigned APK
         run: ./gradlew assembleRelease
 
+      # Sign the APK with the keystore
+      - name: Sign the APK
+        run: |
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+          -keystore release.keystore \
+          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+          -keypass ${{ secrets.KEY_PASSWORD }} \
+          app/build/outputs/apk/release/app-release-unsigned.apk \
+          ${{ secrets.KEY_ALIAS }}
+
+      # Align the APK
+      - name: Zipalign the APK
+        run: |
+          $ANDROID_HOME/build-tools/30.0.3/zipalign -v 4 \
+          app/build/outputs/apk/release/app-release-unsigned.apk \
+          app/build/outputs/apk/release/app-release.apk
+
+      # Create a new release on GitHub
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -44,6 +67,7 @@ jobs:
           draft: false
           prerelease: false
 
+      # Upload the signed and aligned APK to the release
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
         env:
