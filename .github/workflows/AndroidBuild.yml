@@ -35,7 +35,7 @@ jobs:
       - name: Install Android SDK Build Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
+          sudo apt-get install -y wget unzip
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           unzip commandlinetools-linux-8512546_latest.zip -d cmdline-tools
           # Delete the existing latest directory if it exists
@@ -60,27 +60,20 @@ jobs:
       # Step 8: Sign the APK with the keystore
       - name: Sign the APK
         run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-          -keystore release.keystore \
-          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-          -keypass ${{ secrets.KEY_PASSWORD }} \
-          app/build/outputs/apk/release/app-release-unsigned.apk \
-          ${{ secrets.KEY_ALIAS }}
+          $ANDROID_HOME/build-tools/30.0.3/apksigner sign \
+          --ks release.keystore \
+          --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          --out app/build/outputs/apk/release/app-release.apk \
+          app/build/outputs/apk/release/app-release-unsigned.apk
 
-      # Step 9: Align the APK
-      - name: Zipalign the APK
-        run: |
-          ZIPALIGN=$ANDROID_HOME/build-tools/30.0.3/zipalign
-          $ZIPALIGN -v 4 \
-          app/build/outputs/apk/release/app-release-unsigned.apk \
-          app/build/outputs/apk/release/app-release.apk
-
-      # Step 10: Verify APK signature
+      # Step 9: Verify APK signature
       - name: Verify APK Signature
         run: |
           $ANDROID_HOME/build-tools/30.0.3/apksigner verify app/build/outputs/apk/release/app-release.apk
 
-      # Step 11: Create a new release on GitHub
+      # Step 10: Create a new release on GitHub
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -92,7 +85,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # Step 12: Upload the signed and aligned APK to the release
+      # Step 11: Upload the signed APK to the release
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
         env:
