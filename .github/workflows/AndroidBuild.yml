@@ -27,16 +27,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Decode and save keystore file
-        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > my-release-key.keystore
+      - name: Run unit test
+        run: ./gradlew clean testDebug
 
-      - name: Build Signed Release APK
-        run: |
-          ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=my-release-key.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
 
       - name: Create Release
         id: create_release
@@ -47,7 +42,7 @@ jobs:
           tag_name: "v${{ github.run_number }}"
           release_name: "Release ${{ github.run_number }}"
           draft: false
-          release: false
+          prerelease: false
 
       - name: Upload APK to Release
         uses: actions/upload-release-asset@v1
