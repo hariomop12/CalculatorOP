@@ -1,3 +1,18 @@
+<div align="center">
+
+
+
+![App Icon](path/to/your/icon.png)
+
+
+
+
+
+
+
+
+
+</div>
 # Simple Calculator App
 <br>
 Welcome to the CalculatorOP, a simple yet effective Android app designed to perform basic arithmetic operations with ease. Built using modern Android technologies, this app provides a smooth and intuitive user experience for all your calculation needs.
