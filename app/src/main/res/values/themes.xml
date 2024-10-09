@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.CalculatorOP" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowNoTitle">true</item>
+
+        <item name="colorPrimary">@color/action_bar_color</item>
+        <item name="colorPrimaryDark">@color/action_bar_color</item>
+        <item name="colorAccent">@color/action_bar_color</item>
     </style>
+
+
+    <style name="Theme.SplashScreen" parent="Theme.CalculatorOP">
+        <item name="windowSplashScreenBackground">@color/pink_tone</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/icon2</item>
+        <item name="postSplashScreenTheme">@style/Theme.CalculatorOP</item>
+
+    </style>
+    <color name="pink_tone">#FFFFFF</color>
 </resources>
